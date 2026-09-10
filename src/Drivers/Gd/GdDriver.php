@@ -590,11 +590,13 @@ class GdDriver implements ImageDriver
         if (! $fInfo) {
             return;
         }
-
-        $info = finfo_file($fInfo, $path);
-
-        if (! is_string($info) || ! str_contains($info, 'Exif')) {
-            return;
+        try{
+            $info = finfo_file($fInfo, $path);
+            if (! is_string($info) || ! str_contains($info, 'Exif')) {
+                return;
+            }
+        } catch (Throwable $throwable) {
+            // tried to read the finfo but it was too large for libmagic's max params
         }
 
         $result = @exif_read_data($path);
